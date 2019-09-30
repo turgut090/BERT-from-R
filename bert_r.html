@@ -1034,9 +1034,9 @@ pip install keras-bert
 pip install tensorflow==1.15</code></pre>
 </div>
 <h2 id="what-is-bert">What is BERT?</h2>
-<p>BERT<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is a pre-trained deep learning model introduced by Google AI Research which has been trained on Wikipedia and BooksCorpus. It has a unique way to understand the structure of a given text. Instead of reading the text from left to right or from right to left, BERT reads the entire word sequences at once. So, it allows to understanding a word based on its surroundings. There are different kind of pre-trained BERT models but the main difference between them is trained parameters. In our case, <a href="%5BBERT-Base,%20Uncased%5D(https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip)">BERT with 12-layers, 768-hidden, 12-heads, and 110M parameters</a> will be used to create a text classification model.</p>
+<p>BERT<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is a pre-trained deep learning model introduced by Google AI Research which has been trained on Wikipedia and BooksCorpus. It has a unique way to understand the structure of a given text. Instead of reading the text from left to right or from right to left, BERT reads the entire word sequences at once. So, it allows to understanding a word based on its surroundings. There are different kind of pre-trained BERT models but the main difference between them is trained parameters. In our case, <a href="https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip">BERT with 12-layers, 768-hidden, 12-heads, and 110M parameters</a> will be used to create a text classification model.</p>
 <h2 id="model-structure">Model structure</h2>
-<p>Loading a pre-trained BERT model is straightforward. Downloaded zip file contains:</p>
+<p>Loading a pre-trained BERT model is straightforward. <a href="https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip">Downloaded zip file contains</a>:</p>
 <ul>
 <li><em>bert_model.ckpt</em> which is for loading the weights from the TensorFlow checkpoint</li>
 <li><em>bert_config.json</em> which is a configuration file</li>

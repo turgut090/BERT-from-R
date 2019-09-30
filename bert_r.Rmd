@@ -97,11 +97,11 @@ pip install tensorflow==1.15
 
 ## What is BERT?
 
-BERT^[[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)] is a pre-trained deep learning model introduced by Google AI Research which has been trained on Wikipedia and BooksCorpus. It has a unique way to understand the structure of a given text. Instead of reading the text from left to right or from right to left, BERT reads the entire word sequences at once. So, it allows to understanding a word based on its surroundings. There are different kind of pre-trained BERT models but the main difference between them is trained parameters. In our case, [BERT with 12-layers, 768-hidden, 12-heads, and 110M parameters]([BERT-Base, Uncased](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip)) will be used to create a text classification model.
+BERT^[[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)] is a pre-trained deep learning model introduced by Google AI Research which has been trained on Wikipedia and BooksCorpus. It has a unique way to understand the structure of a given text. Instead of reading the text from left to right or from right to left, BERT reads the entire word sequences at once. So, it allows to understanding a word based on its surroundings. There are different kind of pre-trained BERT models but the main difference between them is trained parameters. In our case, [BERT with 12-layers, 768-hidden, 12-heads, and 110M parameters](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip) will be used to create a text classification model.
 
 ## Model structure
 
-Loading a pre-trained BERT model is straightforward. Downloaded zip file contains:
+Loading a pre-trained BERT model is straightforward. [Downloaded zip file contains](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip):
 
 - *bert_model.ckpt* which is for loading the weights from the TensorFlow checkpoint
 - *bert_config.json* which is a configuration file

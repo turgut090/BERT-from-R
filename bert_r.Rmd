@@ -26,11 +26,24 @@ knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 
 Before we start, make sure that Python version is 3 because Python 2 can bring lots of difficulties while working with BERT model such as Unicode issues related to the text.
 
-```{r echo=TRUE,eval=TRUE}
+```{r echo=TRUE,eval=F}
 # to use a preferred version of python, we nee python 3
-reticulate::use_python('C:/Users/turgut.abdullayev/AppData/Local/Continuum/anaconda3/python.exe',required=T)
+reticulate::use_python('C:/Users/turgut.abdullayev/AppData/Local/Continuum/anaconda3/python.exe',
+                       required=T)
 # to see python version
 reticulate::py_discover_config()
+```
+
+```{r eval=F}
+python:         C:/Users/turgut.abdullayev/AppData/Local/Continuum/anaconda3/python.exe
+libpython:      C:/Users/turgut.abdullayev/AppData/Local/Continuum/anaconda3/python37.dll
+pythonhome:     C:\Users\TURGUT~1.ABD\AppData\Local\CONTIN~1\ANACON~1
+version:        3.7.3 (default, Mar 27 2019, 17:13:21) [MSC v.1915 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:\Users\TURGUT~1.ABD\AppData\Local\CONTIN~1\ANACON~1\lib\site-packages\numpy
+numpy_version:  1.16.4
+
+NOTE: Python version was forced by use_python function
 ```
 
 However, a convenient way of importing BERT model with Keras was done by Zhao HG which is called [Keras-bert](https://github.com/CyberZHG/keras-bert). This means that importing the same python library with reticulate can allow us to build a popular state-of-the-art model within R.
@@ -57,14 +70,22 @@ conda install keras-bert
 
 After this procedure, you can check whether keras-bert is installed or not.
 
-```{r eval=TRUE}
+```{r eval=F}
 reticulate::py_module_available('keras_bert')
 ```
 
-Finally, TensorFlow version should be 1.15. You can check it in the following form:
+```{r eval=F}
+[1] TRUE
+```
 
-```{r eval=TRUE}
+Finally, TensorFlow version should be 1.14/1.15. You can check it in the following form:
+
+```{r eval=F}
 tensorflow::tf_version()
+```
+
+```{r eval=F}
+[1] ‘1.14’
 ```
 
 In a nutshell:

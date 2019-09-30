@@ -62,7 +62,7 @@ There are several methods to install keras-bert in Python.
 python3 -m pip install keras-bert
 ```
 
-- in Anaconda prompt (Windows,Linux,Mac OS), run:
+- in Anaconda prompt (Windows), run:
 
 ```{r eval=FALSE}
 conda install keras-bert

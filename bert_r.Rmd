@@ -1,15 +1,15 @@
 ---
 title: "BERT from R"
 description: |
-  A deep learning model - BERT from Google AI Research has given state-of-the-art results in a wide variety of NLP tasks. In this tutorial, we will show how to load and train the BERT model with Keras within R.
+  A deep learning model - BERT from Google AI Research - has yielded state-of-the-art results in a wide variety of Natural Language Processing (NLP) tasks. In this tutorial, we will show how to load and train the BERT model from R, using Keras.
 author:
   - name: Turgut Abdullayev 
     url: https://github.com/henry090
     affiliation: AccessBank Azerbaijan
     affiliation_url: https://www.accessbank.az/en/
-date: "`r Sys.Date()`"
+date: 09-30-2019
 categories:
-  - Bert
+  - Natural Language Processing
 creative_commons: CC BY
 repository_url: https://github.com/henry090/BERT-from-R
 output: 
@@ -22,16 +22,21 @@ preview: images/bert.png
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 
-[In the previous post, Sigrid Keydana](https://blogs.rstudio.com/tensorflow/posts/2019-08-29-using-tf-from-r/) explained the logic behind the [reticulate package](https://rstudio.github.io/reticulate/) and its efficiency for interoperability between Python and R. So, this time we will build a classification model with [BERT](https://github.com/google-research/bert) taking into account one of the powerful capabilities of the reticulate package -- calling Python from R via importing Python modules.
+_Today, we’re happy to feature a guest post written by Turgut Abdullayev, showing how to use BERT from R. Turgut is a data scientist at AccessBank Azerbaijan. Currently, he is pursuing a Ph.D. in economics at Baku State University, Azerbaijan._ 
 
-Before we start, make sure that Python version is 3 because Python 2 can bring lots of difficulties while working with BERT model such as Unicode issues related to the text.
+[In the previous post, Sigrid Keydana](https://blogs.rstudio.com/tensorflow/posts/2019-08-29-using-tf-from-r/) explained the logic behind the [reticulate package](https://rstudio.github.io/reticulate/) and how it enables interoperability between Python and R. So, this time we will build a classification model with [BERT](https://github.com/google-research/bert), taking into account one of the powerful capabilities of the reticulate package -- calling Python from R via importing Python modules.
+
+Before we start, make sure that the Python version used is 3, as Python 2 can introduce lots of difficulties while working with BERT, such as Unicode issues related to the input text.
+
+> Note: The R implementation presupposes TF Keras while by default, keras-bert does not use it. So, adding that environment variable makes it work.
 
 ```{r echo=TRUE,eval=F}
-# to use a preferred version of python, we nee python 3
+Sys.setenv(TF_KERAS=1) 
+# make sure we use python 3
 reticulate::use_python('C:/Users/turgut.abdullayev/AppData/Local/Continuum/anaconda3/python.exe',
                        required=T)
 # to see python version
-reticulate::py_discover_config()
+reticulate::py_config()
 ```
 
 ```{r eval=F}
@@ -46,7 +51,7 @@ numpy_version:  1.16.4
 NOTE: Python version was forced by use_python function
 ```
 
-However, a convenient way of importing BERT model with Keras was done by Zhao HG which is called [Keras-bert](https://github.com/CyberZHG/keras-bert). This means that importing the same python library with reticulate can allow us to build a popular state-of-the-art model within R.
+Luckily for us, a convenient way of importing BERT with Keras was created by Zhao HG. It is called [Keras-bert](https://github.com/CyberZHG/keras-bert). For us, this means that importing that same python library with `reticulate` will allow us to build a popular state-of-the-art model within R.
 
 There are several methods to install keras-bert in Python. 
 
@@ -78,7 +83,7 @@ reticulate::py_module_available('keras_bert')
 [1] TRUE
 ```
 
-Finally, TensorFlow version should be 1.14/1.15. You can check it in the following form:
+Finally, the TensorFlow version used should be 1.14/1.15. You can check it in the following form:
 
 ```{r eval=F}
 tensorflow::tf_version()
@@ -92,20 +97,20 @@ In a nutshell:
 
 ```{r eval=F}
 pip install keras-bert
-pip install tensorflow==1.15
+tensorflow::install_tensorflow(version = "1.15")
 ```
 
 ## What is BERT?
 
-BERT^[[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)] is a pre-trained deep learning model introduced by Google AI Research which has been trained on Wikipedia and BooksCorpus. It has a unique way to understand the structure of a given text. Instead of reading the text from left to right or from right to left, BERT reads the entire word sequences at once. So, it allows to understanding a word based on its surroundings. There are different kind of pre-trained BERT models but the main difference between them is trained parameters. In our case, [BERT with 12-layers, 768-hidden, 12-heads, and 110M parameters](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip) will be used to create a text classification model.
+BERT^[[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)] is a pre-trained deep learning model introduced by Google AI Research which has been trained on Wikipedia and BooksCorpus. It has a unique way to understand the structure of a given text. Instead of reading the text from left to right or from right to left, BERT, using an attention mechanism which is called Transformer encoder^[[Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)], reads the entire word sequences at once. So, it allows to understanding a word based on its surroundings. There are different kind of pre-trained BERT models but the main difference between them is trained parameters. In our case, [BERT](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip) with 12 encoder layers (Transformer Blocks), 768-hidden hidden units, 12-heads^[Attention — focuses on salient parts of input by taking a weighted average of them. 768 hidden units divided by 12 chunks and each chunk will have 64 output dimensions, afterward, the result from each chunk will be concatenated and forwarded to the next layer], and 110M parameters will be used to create a text classification model.
 
 ## Model structure
 
-Loading a pre-trained BERT model is straightforward. [Downloaded zip file contains](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip):
+Loading a pre-trained BERT model is straightforward. The [downloaded zip file](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip) contains:
 
-- *bert_model.ckpt* which is for loading the weights from the TensorFlow checkpoint
-- *bert_config.json* which is a configuration file
-- *vocab.txt* which is for text tokenization
+- *bert_model.ckpt*, which is for loading the weights from the TensorFlow checkpoint
+- *bert_config.json*, which is a configuration file
+- *vocab.txt*, which is for text tokenization
 
 ```{r}
 pretrained_path = '/Users/turgutabdullayev/Downloads/uncased_L-12_H-768_A-12'
@@ -116,25 +121,34 @@ vocab_path = file.path(pretrained_path, 'vocab.txt')
 
 ## Import Keras-Bert module via reticulate
 
-Let's upload keras-bert via reticulate and prepare tokenizer object. BERT tokenizer will help us to turn words into indices.
+Let's load keras-bert via `reticulate` and prepare a tokenizer object. The BERT tokenizer will help us to turn words into indices.
 
 ```{r}
+library(reticulate)
 k_bert = import('keras_bert')
 token_dict = k_bert$load_vocabulary(vocab_path)
 tokenizer = k_bert$Tokenizer(token_dict)
 ```
 
-### How tokenizer works?
+### How does the tokenizer work?
 
 BERT uses a WordPiece tokenization strategy. If a word is Out-of-vocabulary (OOV), then BERT will break it down into subwords. (eating => eat, ##ing).
 
 ```{r, eval=TRUE, echo=FALSE, layout="l-body-outset", fig.cap = "[BERT input representation. The input embeddings are the sum of the token embeddings, the segmentation embeddings, and the position embeddings](https://arxiv.org/pdf/1810.04805.pdf)"}
 knitr::include_graphics("images/emb.png")
 ```
+## Embedding Layers in BERT 
+
+There are 3 types of embedding layers in BERT:
+
+- __Token Embeddings__ help to transform words into vector representations. In our model dimension size is 768.
+- __Segment Embeddings__ help to understand the semantic similarity of different pieces of the text.
+- __Position Embeddings__ mean that identical words at different positions will not have the same output representation.
 
 ## Define model parameters and column names
 
-Similar to Keras standard parameters: input length, batch size, epochs and learning rate should be defined for training a BERT model with Keras.
+As usual with keras, the batch size, number of epochs and the learning rate should be defined for training BERT.
+Additionally, the _sequence length_ is needed.
 
 ```{r}
 seq_length = 50L
@@ -146,11 +160,11 @@ DATA_COLUMN = 'comment_text'
 LABEL_COLUMN = 'target'
 ```
 
-> Note: the max input length is 512 and it is extremely computational even for GPU. 
+> Note: the max input length is 512, and the model is extremely compute intensive even on GPU. 
 
 ## Load BERT model into R
 
-We can load the BERT model and automatically pad sequences with ```seq_len``` function. This is why using keras-bert^[[Implementation of the BERT. Official pre-trained models could be loaded for feature extraction and prediction](https://github.com/CyberZHG/keras-bert)] is a better choice, it makes the loading process very easy and comfortable.
+We can load the BERT model and automatically pad sequences with ```seq_len``` function. Keras-bert^[[Implementation of the BERT. Official pre-trained models could be loaded for feature extraction and prediction](https://github.com/CyberZHG/keras-bert)] makes the loading process very easy and comfortable.
 
 ```{r}
 model = k_bert$load_trained_model_from_checkpoint(
@@ -159,14 +173,13 @@ model = k_bert$load_trained_model_from_checkpoint(
   training=T,
   trainable=T,
   seq_len=seq_length)
-
 ```
 
 ## Data structure, reading, preparation
 
-The dataset for this post is taken from [Kaggle Jigsaw Unintended Bias in Toxicity Classification competition](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification).
+The dataset for this post is taken from the [Kaggle Jigsaw Unintended Bias in Toxicity Classification competition](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification).
 
-In order to prepare the dataset, we should write a preprocessing function which will read and tokenize data simultaneously. Then, we feed the outputs of the function as input for BERT model.
+In order to prepare the dataset, we write a preprocessing function which will read and tokenize data simultaneously. Then, we feed the outputs of the function as input for BERT model.
 
 ```{r}
 # tokenize text
@@ -194,7 +207,7 @@ dt_data = function(dir, rows_to_read){
 
 ## Load dataset
 
-As we have already written the preprocess function, at first, it will read data, then add zeros and encode words into indices. Hence, we will have 3 output files:
+The way we have written the preprocess function, at first, it will read data, then add zeros and encode words into indices. Hence, we will have 3 output files:
 
 - __x_train__ is input matrix for BERT
 - __x_segment__ contains zeros for segment embeddings
@@ -207,7 +220,7 @@ dt_data('~/Downloads/jigsaw-unintended-bias-in-toxicity-classification/train.csv
 
 ## Matrix format for Keras-Bert
 
-Data is in the list format. They need to be extracted and transposed. Then, the train and segment matrices should be placed into the list.
+The input data are in list format. They need to be extracted and transposed. Then, the train and segment matrices should be placed into the list.
 
 ```{r}
 train = do.call(cbind,x_train) %>% t()
@@ -219,7 +232,7 @@ concat = c(list(train ),list(segments))
 
 ## Calculate decay and warmup steps
 
-Adam optimizer with Warmpup helps to slower learning rate at the beginning of the training process. After certain training steps, the learning rate scheduler will gradually be increased because learning new data without warmup can harm BERT model.
+Using the Adam optimizer with warmup helps to lower the learning rate at the beginning of the training process. After certain training steps, the learning rate will gradually be increased, because learning new data without warmup can negatively affect a BERT model.
 
 ```{r}
 c(decay_steps, warmup_steps) %<-% k_bert$calc_train_steps(
@@ -229,30 +242,25 @@ c(decay_steps, warmup_steps) %<-% k_bert$calc_train_steps(
 )
 ```
 
-## Import Keras from Python
-
-```{r}
-k = import('keras')
-```
 
 ## Determine inputs and outputs, then concatenate them
 
 In order to build a binary classification model, the output of the BERT model should contain 1 unit. Therefore, first of all, we should get input and output layers. Then, adding an additional dense layer to the output can perfectly meet our needs.
 
 ```{r}
-input_1 = keras::get_layer(model,name = 'Input-Token')$input
+library(keras)
 
-input_2 = keras::get_layer(model,name = 'Input-Segment')$input
-
+input_1 = get_layer(model,name = 'Input-Token')$input
+input_2 = get_layer(model,name = 'Input-Segment')$input
 inputs = list(input_1,input_2)
 
-dense = keras::get_layer(model,name = 'NSP-Dense')$output
+dense = get_layer(model,name = 'NSP-Dense')$output
 
-outputs = dense %>% k$layers$Dense(units=1L, activation='sigmoid',
+outputs = dense %>% layer_dense(units=1L, activation='sigmoid',
                          kernel_initializer=initializer_truncated_normal(stddev = 0.02),
                          name = 'output')
 
-model = k$models$Model(inputs = inputs,outputs = outputs)
+model = keras_model(inputs = inputs,outputs = outputs)
 ```
 
 This is how the model architecture looks like after adding a dense layer and padding input sequences.
@@ -509,7 +517,7 @@ ________________________________________________________________________________
 
 ## Compile model and begin training 
 
-If you have ever read [tensorflow blog](https://blogs.rstudio.com/tensorflow/), it means you are already familiar with Keras. Before training a model, we need to configure the learning process via the ```compile()``` function. And later with ```fit()``` function, we need to feed R matrices into BERT model.
+Aus usual with Keras, before training a model, we need to compile the model. And using ```fit()```, we feed it the R arrays.
 
 ```{r}
 model %>% compile(
@@ -528,8 +536,7 @@ model %>% fit(
 
 ## Conclusion
 
-There are different methods of importing BERT model into R. But as always Keras provides us with a straightforward functionality that helps to load, train BERT model with a quick and an efficient way.
-
+In this post, we've shown how we can use Keras to conveniently load, configure, and train a BERT model.
 
 
 
